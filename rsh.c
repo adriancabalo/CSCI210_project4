@@ -97,15 +97,6 @@ int main(int argc, char **argv) {
 
     strcpy(uName,argv[1]);
 
-    // TODO:
-    // create the message listener thread
-    char userFIFO[256];
-    snprintf(userFIFO, sizeof(userFIFO), "%s", argv[1]);
-    if (mkfifo(userFIFO, 0666) == -1) {
-        perror("mkfifo failed");
-        exit(1);
-    }
-
     // TODO: Create the message listener thread
     pthread_t listenerThread;
     pthread_create(&listenerThread, NULL, messageListener, NULL);
