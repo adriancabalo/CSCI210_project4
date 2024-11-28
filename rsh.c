@@ -65,9 +65,9 @@ void* messageListener(void *arg) {
 	
         // Print the incoming message
         printf("Incoming message from %s: %s\n", req.source, req.msg);
+    	
+	close(userFIFO);
     }
-
-    close(userFIFO);
     pthread_exit((void*)0);
 }
 
