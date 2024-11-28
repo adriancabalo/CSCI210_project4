@@ -135,26 +135,31 @@ int main(int argc, char **argv) {
 		// printf("sendmsg: you have to specify target user\n");
 		// if no message is specified, you should print the followingA
  		// printf("sendmsg: you have to enter a message\n");
-		char target[50], message[200];
 
-            // Get the target user
-            char *msgPart = strtok(NULL, " ");
-            if (msgPart == NULL) {
-                printf("sendmsg: you have to specify target user\n");
-                continue;
-            }
-            strcpy(target, msgPart);
+char *target = strtok(NULL, " "); // First argument after 'sendmsg' is the target user
+    if (target == NULL) {
+        printf("sendmsg: you have to specify target user\n");
+        continue;
+    }
 
-            // Get the message
-            msgPart = strtok(NULL, "");
-            if (msgPart == NULL) {
-                printf("sendmsg: you have to enter a message\n");
-                continue;
-            }
-            strcpy(message, msgPart);
+    // The rest of the line is the message
+    char *message = strtok(NULL, " ");
+    if (message == NULL) {
+        printf("sendmsg: you have to enter a message\n");
+        continue;
+    }
 
-            // Call the sendmsg function
-            sendmsg(uName, target, message);
+    // Concatenate the remaining parts of the message
+    char fullMessage[200];
+    strcpy(fullMessage, message);
+    char *msgPart;
+    while ((msgPart = strtok(NULL, " ")) != NULL) {
+        strcat(fullMessage, " ");
+        strcat(fullMessage, msgPart);
+    }
+
+    // Now, call the sendmsg function with the target user and the full message
+    sendmsg(uName, target, fullMessage);
             continue;
 	}
 
