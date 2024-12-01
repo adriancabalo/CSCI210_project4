@@ -6,8 +6,6 @@
 #include <string.h>
 #include <fcntl.h>
 #include <pthread.h>
-#include <sys/types.h>   // Add this for mkfifo
-#include <sys/stat.h>    // Add this for mkfifo
 
 #define N 13
 
@@ -54,21 +52,32 @@ void* messageListener(void *arg) {
 	// following format
 	// Incoming message from [source]: [message]
 	// put an end of line at the end of the message
-    	int userFIFO;
-    	struct message req;
+char *uName = (char*)arg; // Username passed as an argument
+    int userFIFO;
+    struct message req;
 
-    	// Open the user's FIFO (user's FIFO is named after the username)
-    	while (1) {
-		userFIFO = open(uName, O_RDONLY);
-        	// Read the incoming message
-        	read(userFIFO, &req, sizeof(struct message));
-	
-        	// Print the incoming message
-        	printf("Incoming message from %s: %s\n", req.source, req.msg);
-    	
-		close(userFIFO);
-    	}
-    	pthread_exit((void*)0);
+    // Open the user's FIFO for reading
+    userFIFO = open(uName, O_RDONLY);
+    if (userFIFO == -1) {
+        perror("Failed to open user FIFO");
+        pthread_exit((void*)1);
+    }
+
+    while (1) {
+        // Read the incoming message
+        ssize_t bytesRead = read(userFIFO, &req, sizeof(struct message));
+
+        // Check if the read was successful and complete
+        if (bytesRead != sizeof(struct message)) {
+            continue; // Ignore incomplete or failed reads
+        }
+
+        // Print the incoming message
+        printf("Incoming message from %s: %s\n", req.source, req.msg);
+    }
+
+    close(userFIFO); // Close the FIFO when done
+	pthread_exit((void*)0);    
 }
 
 int isAllowed(const char*cmd) {
@@ -99,7 +108,7 @@ int main(int argc, char **argv) {
 
     // TODO: Create the message listener thread
     pthread_t listenerThread;
-    pthread_create(&listenerThread, NULL, messageListener, NULL);
+    pthread_create(&listenerThread, NULL, messageListener, uName);
 
 
     while (1) {
