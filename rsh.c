@@ -33,17 +33,17 @@ void sendmsg (char *user, char *target, char *msg) {
 	// Send a request to the server to send the message (msg) to the target user (target)
 	// by creating the message structure and writing it to server's FIFO
 	int server;
-    struct message req;
+    	struct message req;
 
-    // Prepare the message struct
-    strcpy(req.source, user);
-    strcpy(req.target, target);
-    strcpy(req.msg, msg);
+    	// Prepare the message struct
+    	strcpy(req.source, user);
+    	strcpy(req.target, target);
+    	strcpy(req.msg, msg);
 
-    // Open server FIFO and send the message
-    server = open("serverFIFO", O_WRONLY);
-    write(server, &req, sizeof(struct message));
-    close(server);
+    	// Open server FIFO and send the message
+    	server = open("serverFIFO", O_WRONLY);
+    	write(server, &req, sizeof(struct message));
+    	close(server);
 }
 
 void* messageListener(void *arg) {
@@ -54,21 +54,21 @@ void* messageListener(void *arg) {
 	// following format
 	// Incoming message from [source]: [message]
 	// put an end of line at the end of the message
-    int userFIFO;
-    struct message req;
+    	int userFIFO;
+    	struct message req;
 
-    // Open the user's FIFO (user's FIFO is named after the username)
-    while (1) {
-	userFIFO = open(uName, O_RDONLY);
-        // Read the incoming message
-        read(userFIFO, &req, sizeof(struct message));
+    	// Open the user's FIFO (user's FIFO is named after the username)
+    	while (1) {
+		userFIFO = open(uName, O_RDONLY);
+        	// Read the incoming message
+        	read(userFIFO, &req, sizeof(struct message));
 	
-        // Print the incoming message
-        printf("Incoming message from %s: %s\n", req.source, req.msg);
+        	// Print the incoming message
+        	printf("Incoming message from %s: %s\n", req.source, req.msg);
     	
-	close(userFIFO);
-    }
-    pthread_exit((void*)0);
+		close(userFIFO);
+    	}
+    	pthread_exit((void*)0);
 }
 
 int isAllowed(const char*cmd) {
@@ -136,31 +136,31 @@ int main(int argc, char **argv) {
 		// if no message is specified, you should print the followingA
  		// printf("sendmsg: you have to enter a message\n");
 
-char *target = strtok(NULL, " "); // First argument after 'sendmsg' is the target user
-    if (target == NULL) {
-        printf("sendmsg: you have to specify target user\n");
-        continue;
-    }
+		char *target = strtok(NULL, " "); // First argument after 'sendmsg' is the target user
+    		if (target == NULL) {
+        		printf("sendmsg: you have to specify target user\n");
+        		continue;
+    		}
 
-    // The rest of the line is the message
-    char *message = strtok(NULL, " ");
-    if (message == NULL) {
-        printf("sendmsg: you have to enter a message\n");
-        continue;
-    }
+    		// The rest of the line is the message
+    		char *message = strtok(NULL, " ");
+    		if (message == NULL) {
+        		printf("sendmsg: you have to enter a message\n");
+        		continue;
+    		}
 
-    // Concatenate the remaining parts of the message
-    char fullMessage[200];
-    strcpy(fullMessage, message);
-    char *msgPart;
-    while ((msgPart = strtok(NULL, " ")) != NULL) {
-        strcat(fullMessage, " ");
-        strcat(fullMessage, msgPart);
-    }
+    		// Concatenate the remaining parts of the message
+    		char fullMessage[200];
+    		strcpy(fullMessage, message);
+    		char *msgPart;
+    		while ((msgPart = strtok(NULL, " ")) != NULL) {
+        		strcat(fullMessage, " ");
+        		strcat(fullMessage, msgPart);
+    		}
 
-    // Now, call the sendmsg function with the target user and the full message
-    sendmsg(uName, target, fullMessage);
-            continue;
+    		// Now, call the sendmsg function with the target user and the full message
+    		sendmsg(uName, target, fullMessage);
+            	continue;
 	}
 
 	if (strcmp(cmd,"exit")==0) break;
